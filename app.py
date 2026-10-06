@@ -334,6 +334,10 @@ PREDICTIONS_PATH = Path(
     "data/xgboost_test_predictions.csv"
 )
 
+MODEL_COMPARISON_PATH = Path(
+    "data/final_model_comparison.csv"
+)
+
 
 # ============================================================
 # 3. VERIFY REQUIRED FILES
@@ -352,6 +356,15 @@ if not PREDICTIONS_PATH.exists():
 
     st.error(
         f"Prediction file not found: {PREDICTIONS_PATH}"
+    )
+
+    st.stop()
+
+
+if not MODEL_COMPARISON_PATH.exists():
+
+    st.error(
+        f"Model comparison file not found: {MODEL_COMPARISON_PATH}"
     )
 
     st.stop()
@@ -395,17 +408,100 @@ def load_test_predictions():
 test_predictions = load_test_predictions()
 
 
+@st.cache_data
+def load_model_comparison():
+
+    comparison = pd.read_csv(
+        MODEL_COMPARISON_PATH
+    )
+
+    return comparison
+
+
+model_comparison = load_model_comparison()
+
+
 # ============================================================
-# 6. HIGH-RISK THRESHOLD
+# 6. TEST-SET BUSINESS METRICS
 # ============================================================
 
-# Highest-risk 10% of the out-of-time test population.
+# Retention capacity is fixed at the highest-risk 10% of the
+# out-of-time test population. Ranking creates an exact segment.
+
+ranked_predictions = (
+    test_predictions
+    .sort_values(
+        "xgb_churn_probability",
+        ascending=False
+    )
+    .reset_index(drop=True)
+)
+
+TEST_OBSERVATIONS = len(ranked_predictions)
+
+TARGET_COUNT = max(
+    1,
+    int(np.ceil(TEST_OBSERVATIONS * 0.10))
+)
+
+top_risk_predictions = (
+    ranked_predictions
+    .head(TARGET_COUNT)
+    .copy()
+)
 
 HIGH_RISK_THRESHOLD = (
-    test_predictions[
+    top_risk_predictions[
         "xgb_churn_probability"
     ]
-    .quantile(0.90)
+    .min()
+)
+
+ACTUAL_CHURNERS = int(
+    ranked_predictions["is_churn"].sum()
+)
+
+CAPTURED_CHURNERS = int(
+    top_risk_predictions["is_churn"].sum()
+)
+
+OVERALL_CHURN_RATE = ranked_predictions["is_churn"].mean()
+TOP_RISK_CHURN_RATE = top_risk_predictions["is_churn"].mean()
+
+CAPTURE_RATE = (
+    CAPTURED_CHURNERS / ACTUAL_CHURNERS
+    if ACTUAL_CHURNERS
+    else 0.0
+)
+
+RETENTION_LIFT = (
+    TOP_RISK_CHURN_RATE / OVERALL_CHURN_RATE
+    if OVERALL_CHURN_RATE
+    else 0.0
+)
+
+ranked_predictions["expected_monthly_revenue_at_risk"] = (
+    ranked_predictions["xgb_churn_probability"]
+    * ranked_predictions["current_mrr"]
+)
+
+top_risk_predictions["expected_monthly_revenue_at_risk"] = (
+    top_risk_predictions["xgb_churn_probability"]
+    * top_risk_predictions["current_mrr"]
+)
+
+TOTAL_REVENUE_AT_RISK = (
+    ranked_predictions["expected_monthly_revenue_at_risk"].sum()
+)
+
+HIGH_PRIORITY_REVENUE_AT_RISK = (
+    top_risk_predictions["expected_monthly_revenue_at_risk"].sum()
+)
+
+HIGH_PRIORITY_REVENUE_SHARE = (
+    HIGH_PRIORITY_REVENUE_AT_RISK / TOTAL_REVENUE_AT_RISK
+    if TOTAL_REVENUE_AT_RISK
+    else 0.0
 )
 
 
