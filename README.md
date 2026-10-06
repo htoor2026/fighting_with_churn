@@ -57,7 +57,7 @@ flowchart TD
     E --> I[Final customer-observation dataset]
     H --> I
     I --> J[Behavioral feature engineering]
-    J --> K[Temporal train / test split]
+    J --> K[Purged temporal train / test split]
     K --> L[Logistic Regression: core vs extended]
     K --> M[XGBoost: core vs extended]
     L --> N[Model comparison]
@@ -106,16 +106,20 @@ A key final design choice was to calculate all eight behavioral features directl
 
 ## Modeling approach
 
-The project uses an out-of-time split rather than relying only on a random split, so evaluation better reflects a forecasting use case.
+The project uses a purged out-of-time split rather than relying only on a random split. Because the churn label looks forward approximately one month, training ends one month before the test period begins. The intervening observations are excluded as an embargo so training labels do not overlap the future evaluation window.
 
 Models compared:
 
+<!-- AUTO_MODEL_RESULTS_START -->
 | Model | ROC-AUC | PR-AUC |
 |---|---:|---:|
 | Logistic Regression - Core | 0.6529 | 0.0426 |
 | Logistic Regression - Extended | 0.6526 | 0.0438 |
 | XGBoost - Core | 0.6619 | 0.0589 |
 | **XGBoost - Extended** | **0.6735** | **0.0620** |
+
+Best model by PR-AUC: **XGBoost - Extended**.
+<!-- AUTO_MODEL_RESULTS_END -->
 
 The final selected model is the **Extended XGBoost** model. The subscription features add modest incremental predictive value in the nonlinear model.
 
@@ -125,6 +129,7 @@ Because churn is rare, PR-AUC and lift are emphasized alongside ROC-AUC rather t
 
 On the out-of-time test set:
 
+<!-- AUTO_RETENTION_RESULTS_START -->
 - 11,645 customers were scored;
 - 188 churners were observed;
 - baseline churn rate was **1.61%**;
@@ -132,6 +137,7 @@ On the out-of-time test set:
 - that group captured **60 of 188 churners (31.91%)**;
 - churn rate inside the targeted group was **5.15%**;
 - lift versus random targeting was **3.19x**.
+<!-- AUTO_RETENTION_RESULTS_END -->
 
 ## Revenue-at-risk prioritization
 
@@ -143,9 +149,11 @@ churn probability × current MRR
 
 Across the test set:
 
+<!-- AUTO_REVENUE_RESULTS_START -->
 - expected monthly revenue at risk: **$3,036.17**;
 - expected monthly revenue at risk in the top-risk 10%: **$1,200.78**;
 - the top-risk 10% therefore concentrates about **39.5%** of modeled monthly revenue exposure.
+<!-- AUTO_REVENUE_RESULTS_END -->
 
 This is an expected-value prioritization metric, not a guaranteed revenue-loss estimate.
 
@@ -173,6 +181,8 @@ fighting_with_churn/
 ├── data/
 ├── models/
 ├── notebooks/
+├── scripts/
+│   └── retrain_models.py
 ├── sql/
 │   ├── 01_subscription_extension.sql
 │   └── 02_final_training_dataset.sql
@@ -219,6 +229,16 @@ python -m streamlit run app.py
 ```
 
 Then open the local Streamlit URL shown in the terminal.
+
+### Rebuild the model outputs
+
+After changing modeling code, regenerate the purged-validation models and business outputs with:
+
+```bash
+python scripts/retrain_models.py
+```
+
+The rebuild script retrains Logistic Regression and XGBoost, refreshes both saved models, test predictions, model-comparison CSVs, the high-priority retention file, `data/project_metrics.json`, and the auto-generated result blocks in this README.
 
 ## Important limitations
 
