@@ -121,7 +121,7 @@ Models compared:
 Best model by PR-AUC: **XGBoost - Extended**.
 <!-- AUTO_MODEL_RESULTS_END -->
 
-The final selected model is the **Extended XGBoost** model. The subscription features add modest incremental predictive value in the nonlinear model.
+The deployed application uses the **Extended XGBoost** model so scoring can incorporate both behavioral and subscription signals. The comparison table above is refreshed by the reproducible retraining script whenever the model outputs are rebuilt.
 
 Because churn is rare, PR-AUC and lift are emphasized alongside ROC-AUC rather than using accuracy as the primary metric.
 
