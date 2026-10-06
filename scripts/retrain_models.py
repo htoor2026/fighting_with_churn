@@ -21,7 +21,8 @@ DATA_DIR = ROOT / "data"
 MODEL_DIR = ROOT / "models"
 README_PATH = ROOT / "README.md"
 
-DATA_PATH = DATA_DIR / "churn_modeling_ready.csv"
+RAW_DATA_PATH = DATA_DIR / "churn_training_final.csv"
+MODELING_DATA_PATH = DATA_DIR / "churn_modeling_ready.csv"
 
 TEST_START = pd.Timestamp("2020-04-11")
 TRAIN_END = TEST_START - pd.DateOffset(months=1)
@@ -76,6 +77,132 @@ EXTENDED_NUMERIC = CORE_NUMERIC + [
 ]
 
 EXTENDED_FEATURES = EXTENDED_CATEGORICAL + EXTENDED_NUMERIC
+
+
+def build_modeling_dataset() -> pd.DataFrame:
+    df = pd.read_csv(
+        RAW_DATA_PATH,
+        parse_dates=["observation_date"],
+    )
+
+    df["country"] = df["country"].fillna("Unknown")
+
+    df["is_churn"] = (
+        df["is_churn"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+        .map(
+            {
+                "t": 1,
+                "true": 1,
+                "1": 1,
+                "f": 0,
+                "false": 0,
+                "0": 0,
+            }
+        )
+    )
+
+    df["total_engagement"] = (
+        df["post_per_month"]
+        + df["newfriend_per_month"]
+        + df["like_per_month"]
+        + df["message_per_month"]
+        + df["reply_per_month"]
+    )
+
+    df["negative_engagement"] = (
+        df["dislike_per_month"]
+        + df["unfriend_per_month"]
+    )
+
+    df["total_activity"] = (
+        df["post_per_month"]
+        + df["newfriend_per_month"]
+        + df["like_per_month"]
+        + df["adview_per_month"]
+        + df["dislike_per_month"]
+        + df["unfriend_per_month"]
+        + df["message_per_month"]
+        + df["reply_per_month"]
+    )
+
+    df["dislike_rate"] = np.where(
+        (
+            df["like_per_month"]
+            + df["dislike_per_month"]
+        )
+        > 0,
+        df["dislike_per_month"]
+        / (
+            df["like_per_month"]
+            + df["dislike_per_month"]
+        ),
+        0.0,
+    )
+
+    df["unfriend_rate"] = np.where(
+        (
+            df["newfriend_per_month"]
+            + df["unfriend_per_month"]
+        )
+        > 0,
+        df["unfriend_per_month"]
+        / (
+            df["newfriend_per_month"]
+            + df["unfriend_per_month"]
+        ),
+        0.0,
+    )
+
+    df["reply_rate"] = np.where(
+        df["message_per_month"] > 0,
+        df["reply_per_month"]
+        / df["message_per_month"],
+        0.0,
+    )
+
+    df["negative_activity_share"] = np.where(
+        df["total_activity"] > 0,
+        df["negative_engagement"]
+        / df["total_activity"],
+        0.0,
+    )
+
+    df["adview_share"] = np.where(
+        df["total_activity"] > 0,
+        df["adview_per_month"]
+        / df["total_activity"],
+        0.0,
+    )
+
+    model_df = df[
+        [
+            "account_id",
+            "observation_date",
+            "is_churn",
+        ]
+        + EXTENDED_FEATURES
+    ].copy()
+
+    if model_df.isna().any().any():
+        missing = (
+            model_df.isna()
+            .sum()
+            .loc[lambda values: values > 0]
+        )
+        raise ValueError(
+            "Unexpected missing values in modeling data:\n"
+            + missing.to_string()
+        )
+
+    model_df.to_csv(
+        MODELING_DATA_PATH,
+        index=False,
+    )
+
+    return model_df
 
 
 def evaluate(name: str, y_true: pd.Series, probabilities: np.ndarray) -> dict:
@@ -263,10 +390,7 @@ def update_readme(metrics: dict) -> None:
 
 
 def main() -> None:
-    df = pd.read_csv(
-        DATA_PATH,
-        parse_dates=["observation_date"],
-    )
+    df = build_modeling_dataset()
 
     train_df, embargo_df, test_df = split_data(df)
 
