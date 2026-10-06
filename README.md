@@ -62,7 +62,7 @@ flowchart TD
     K --> M[XGBoost: core vs extended]
     L --> N[Model comparison]
     M --> N
-    N --> O[Extended XGBoost selected]
+    N --> O[Extended XGBoost deployed]
     O --> P[Churn probability and risk ranking]
     P --> Q[Top 10% retention target]
     P --> R[Probability x MRR]
