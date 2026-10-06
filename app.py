@@ -2099,15 +2099,15 @@ Current Monthly Recurring Revenue
 
 
     st.write(
-        """
+        f"""
         Across the out-of-time test observations:
 
         Expected monthly revenue at risk:
-        $3,036.17
+        ${TOTAL_REVENUE_AT_RISK:,.2f}
 
         Expected monthly revenue at risk in the high-priority
         retention segment:
-        $1,200.78
+        ${HIGH_PRIORITY_REVENUE_AT_RISK:,.2f}
         """
     )
 
