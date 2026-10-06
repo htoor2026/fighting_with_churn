@@ -652,14 +652,15 @@ with business_tab:
 
 
     st.write(
-        """
-        In the out-of-time test population, targeting only the
-        highest-risk 10% of customer observations identified
-        approximately 31.9% of actual churners.
+        f"""
+        In the out-of-time test population, targeting the
+        highest-risk 10% ({TARGET_COUNT:,} of {TEST_OBSERVATIONS:,}
+        customer observations) identified {CAPTURED_CHURNERS:,} of
+        {ACTUAL_CHURNERS:,} actual churners, or {CAPTURE_RATE:.1%}.
 
-        The targeted group's churn rate was approximately 5.15%,
-        compared with 1.61% across the full test population,
-        representing approximately 3.19 times lift.
+        The targeted group's churn rate was {TOP_RISK_CHURN_RATE:.2%},
+        compared with {OVERALL_CHURN_RATE:.2%} across the full test
+        population, representing {RETENTION_LIFT:.2f}x lift.
         """
     )
 
