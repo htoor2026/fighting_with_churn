@@ -1,0 +1,52 @@
+name: Retrain project outputs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/retrain.yml"
+      - "scripts/retrain_models.py"
+      - "requirements.txt"
+      - "data/churn_training_final.csv"
+      - "notebooks/01_data_validation_and_eda.ipynb"
+      - "notebooks/02_exploratory_analysis_feature_engineering.ipynb"
+      - "notebooks/04_logistic_regression.ipynb"
+      - "notebooks/05_xgboost_backtest.ipynb"
+      - "notebooks/06_retention_business_analysis.ipynb"
+
+permissions:
+  contents: write
+
+jobs:
+  retrain:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Rebuild modeling outputs
+        run: python scripts/retrain_models.py
+
+      - name: Commit regenerated artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md data models
+          if git diff --cached --quiet; then
+            echo "No regenerated changes to commit."
+          else
+            git commit -m "Rebuild purged temporal validation outputs [skip ci]"
+            git push
+          fi
