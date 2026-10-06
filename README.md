@@ -43,6 +43,37 @@ The final project extends the behavioral baseline with a richer synthetic subscr
 
 The final modeling workflow compares a behavior-only feature set with the extended behavior + subscription feature set.
 
+## Project flow
+
+```mermaid
+flowchart TD
+    A[ChurnSim / SocialNet raw data] --> B[Baseline churn framework]
+    B --> C[Active periods and observation labels]
+    C --> D[28-day raw-event aggregation]
+    D --> E[All 8 behavior features]
+    A --> F[Synthetic subscription extension]
+    F --> G[Plan, MRR, billing term and discount]
+    G --> H[Upgrade / downsell movement features]
+    E --> I[Final customer-observation dataset]
+    H --> I
+    I --> J[Behavioral feature engineering]
+    J --> K[Temporal train / test split]
+    K --> L[Logistic Regression: core vs extended]
+    K --> M[XGBoost: core vs extended]
+    L --> N[Model comparison]
+    M --> N
+    N --> O[Extended XGBoost selected]
+    O --> P[Churn probability and risk ranking]
+    P --> Q[Top 10% retention target]
+    P --> R[Probability x MRR]
+    R --> S[Expected monthly revenue at risk]
+    Q --> T[Retention prioritization]
+    S --> T
+    T --> U[Streamlit decision-support app]
+```
+
+The baseline work is retained under `baseline/` for methodology and learning history, while the final portfolio pipeline uses the cleaned datasets, final notebooks, saved models, SQL reconstruction, and Streamlit application.
+
 ## Data
 
 The underlying customer behavior is simulated SocialNet / ChurnSim data. The subscription enrichment is a synthetic extension created for this project.
@@ -61,6 +92,17 @@ Behavioral inputs include:
 - replies.
 
 Additional engineered features include total engagement, total activity, negative engagement, dislike rate, unfriend rate, reply rate, negative activity share, and ad-view share.
+
+## SQL pipeline
+
+The top-level `sql/` folder documents the final database-building logic:
+
+- `sql/01_subscription_extension.sql` reconstructs the synthetic commercial layer used in the project: Basic / Plus / Premium plans, $10 / $20 / $35 base MRR, 1 / 3 / 6 month billing commitments, 0% / 5% / 10% billing discounts, and behavior-informed upgrade/downsell features.
+- `sql/02_final_training_dataset.sql` creates the final account-observation modeling table by joining churn labels, demographics, account tenure, the subscription extension, and all eight behavioral event types aggregated directly from raw `socialnet7.event` data over a 28-day lookback window.
+
+These two files are a cleaned portfolio reconstruction based on the final project schema, notebooks, application logic, and completed dataset. They document how the final pipeline was built, but are not presented as byte-for-byte copies of the original exploratory development commands.
+
+A key final design choice was to calculate all eight behavioral features directly from the raw event table rather than attempting to repopulate missing legacy metric IDs.
 
 ## Modeling approach
 
@@ -131,6 +173,9 @@ fighting_with_churn/
 ├── data/
 ├── models/
 ├── notebooks/
+├── sql/
+│   ├── 01_subscription_extension.sql
+│   └── 02_final_training_dataset.sql
 └── simulation_reference/
     └── socialnet7/
 ```
@@ -152,6 +197,9 @@ notebooks/02_exploratory_analysis_feature_engineering.ipynb
 notebooks/04_logistic_regression.ipynb
 notebooks/05_xgboost_backtest.ipynb
 notebooks/06_retention_business_analysis.ipynb
+
+sql/01_subscription_extension.sql
+sql/02_final_training_dataset.sql
 ```
 
 ## Run locally
