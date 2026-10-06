@@ -1854,44 +1854,25 @@ May 10, 2020
     st.subheader("7. Model Comparison")
 
 
-    model_results = pd.DataFrame(
-        {
-
-            "Model": [
-
-                "Logistic Regression - Core",
-
-                "Logistic Regression - Extended",
-
-                "XGBoost - Core",
-
-                "XGBoost - Extended"
-            ],
-
-            "ROC-AUC": [
-
-                0.6529,
-
-                0.6526,
-
-                0.6619,
-
-                0.6735
-            ],
-
-            "PR-AUC": [
-
-                0.0426,
-
-                0.0438,
-
-                0.0589,
-
-                0.0620
-            ]
-        }
+    model_results = (
+        model_comparison
+        .rename(
+            columns={
+                "model": "Model",
+                "roc_auc": "ROC-AUC",
+                "pr_auc": "PR-AUC"
+            }
+        )
+        .copy()
     )
 
+    model_results["ROC-AUC"] = (
+        model_results["ROC-AUC"].round(4)
+    )
+
+    model_results["PR-AUC"] = (
+        model_results["PR-AUC"].round(4)
+    )
 
     st.dataframe(
         model_results,
@@ -1900,30 +1881,74 @@ May 10, 2020
     )
 
 
+    best_model_row = (
+        model_comparison
+        .sort_values(
+            "pr_auc",
+            ascending=False
+        )
+        .iloc[0]
+    )
+
     st.success(
-        """
-        Final model: Extended XGBoost
+        f"""
+        Final model by PR-AUC: {best_model_row["model"]}
 
-        ROC-AUC: 0.6735
+        ROC-AUC: {best_model_row["roc_auc"]:.4f}
 
-        PR-AUC: 0.0620
+        PR-AUC: {best_model_row["pr_auc"]:.4f}
 
-        Test-period churn prevalence: 1.61%
-        """
-    )
-
-
-    st.write(
-        """
-        Subscription features provided little improvement to the
-        Logistic Regression model but improved the XGBoost model.
-
-        This suggests that some subscription information contributes
-        through nonlinear relationships or interactions with customer
-        behavior.
+        Test-period churn prevalence: {OVERALL_CHURN_RATE:.2%}
         """
     )
 
+
+    logistic_core_pr = model_comparison.loc[
+        model_comparison["model"] == "Logistic - Core",
+        "pr_auc"
+    ]
+
+    logistic_ext_pr = model_comparison.loc[
+        model_comparison["model"] == "Logistic - Extended",
+        "pr_auc"
+    ]
+
+    xgb_core_pr = model_comparison.loc[
+        model_comparison["model"] == "XGBoost - Core",
+        "pr_auc"
+    ]
+
+    xgb_ext_pr = model_comparison.loc[
+        model_comparison["model"] == "XGBoost - Extended",
+        "pr_auc"
+    ]
+
+    if (
+        not logistic_core_pr.empty
+        and not logistic_ext_pr.empty
+        and not xgb_core_pr.empty
+        and not xgb_ext_pr.empty
+    ):
+
+        logistic_delta = (
+            logistic_ext_pr.iloc[0]
+            - logistic_core_pr.iloc[0]
+        )
+
+        xgb_delta = (
+            xgb_ext_pr.iloc[0]
+            - xgb_core_pr.iloc[0]
+        )
+
+        st.write(
+            f"""
+            Adding the subscription extension changed PR-AUC by
+            {logistic_delta:+.4f} for Logistic Regression and
+            {xgb_delta:+.4f} for XGBoost. This comparison isolates
+            the incremental predictive value of the commercial
+            subscription features.
+            """
+        )
 
     # ========================================================
     # 8. XGBOOST FEATURE IMPORTANCE
