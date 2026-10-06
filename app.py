@@ -2052,21 +2052,21 @@ May 10, 2020
 
             "Result": [
 
-                "11,645",
+                f"{TEST_OBSERVATIONS:,}",
 
-                "188",
+                f"{ACTUAL_CHURNERS:,}",
 
-                "1,165",
+                f"{TARGET_COUNT:,}",
 
-                "60",
+                f"{CAPTURED_CHURNERS:,}",
 
-                "31.91%",
+                f"{CAPTURE_RATE:.2%}",
 
-                "1.61%",
+                f"{OVERALL_CHURN_RATE:.2%}",
 
-                "5.15%",
+                f"{TOP_RISK_CHURN_RATE:.2%}",
 
-                "3.19x"
+                f"{RETENTION_LIFT:.2f}x"
             ]
         }
     )
