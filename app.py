@@ -691,9 +691,9 @@ with business_tab:
 
 
     st.write(
-        """
-        Approximately 40% of modeled monthly revenue exposure was
-        concentrated in the highest-risk retention segment.
+        f"""
+        {HIGH_PRIORITY_REVENUE_SHARE:.1%} of modeled monthly revenue
+        exposure is concentrated in the highest-risk retention segment.
 
         This allows the company to prioritize customers using both
         predicted churn risk and customer economic value.
