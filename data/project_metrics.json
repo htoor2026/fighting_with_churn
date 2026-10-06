@@ -1,0 +1,46 @@
+{
+  "validation": {
+    "train_before": "2020-03-11",
+    "embargo_start": "2020-03-11",
+    "test_start": "2020-04-11",
+    "train_rows": 10495,
+    "embargo_rows": 10757,
+    "test_rows": 11645
+  },
+  "models": [
+    {
+      "model": "Logistic - Core",
+      "roc_auc": 0.4373424961790525,
+      "pr_auc": 0.01556379979669534
+    },
+    {
+      "model": "Logistic - Extended",
+      "roc_auc": 0.4384339964975422,
+      "pr_auc": 0.015560169382639582
+    },
+    {
+      "model": "XGBoost - Core",
+      "roc_auc": 0.5747313265698384,
+      "pr_auc": 0.037297261127841416
+    },
+    {
+      "model": "XGBoost - Extended",
+      "roc_auc": 0.5721462675424668,
+      "pr_auc": 0.035276363294268906
+    }
+  ],
+  "deployed_model": "XGBoost - Extended",
+  "retention": {
+    "test_observations": 11645,
+    "actual_churners": 188,
+    "targeted_observations": 1165,
+    "captured_churners": 41,
+    "capture_rate": 0.21808510638297873,
+    "overall_churn_rate": 0.01614426792614856,
+    "target_churn_rate": 0.0351931330472103,
+    "lift": 2.1799150762487445,
+    "total_revenue_at_risk": 3679.67402679674,
+    "high_priority_revenue_at_risk": 1644.7142555406317,
+    "high_priority_revenue_share": 0.44697281432083863
+  }
+}

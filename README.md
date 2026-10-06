@@ -113,12 +113,12 @@ Models compared:
 <!-- AUTO_MODEL_RESULTS_START -->
 | Model | ROC-AUC | PR-AUC |
 |---|---:|---:|
-| Logistic Regression - Core | 0.6529 | 0.0426 |
-| Logistic Regression - Extended | 0.6526 | 0.0438 |
-| XGBoost - Core | 0.6619 | 0.0589 |
-| **XGBoost - Extended** | **0.6735** | **0.0620** |
+| Logistic - Core | 0.4373 | 0.0156 |
+| Logistic - Extended | 0.4384 | 0.0156 |
+| **XGBoost - Core** | **0.5747** | **0.0373** |
+| XGBoost - Extended | 0.5721 | 0.0353 |
 
-Best model by PR-AUC: **XGBoost - Extended**.
+Best model by PR-AUC: **XGBoost - Core**.
 <!-- AUTO_MODEL_RESULTS_END -->
 
 The deployed application uses the **Extended XGBoost** model so scoring can incorporate both behavioral and subscription signals. The comparison table above is refreshed by the reproducible retraining script whenever the model outputs are rebuilt.
@@ -134,9 +134,9 @@ On the out-of-time test set:
 - 188 churners were observed;
 - baseline churn rate was **1.61%**;
 - targeting the highest-risk 10% selected 1,165 customers;
-- that group captured **60 of 188 churners (31.91%)**;
-- churn rate inside the targeted group was **5.15%**;
-- lift versus random targeting was **3.19x**.
+- that group captured **41 of 188 churners (21.81%)**;
+- churn rate inside the targeted group was **3.52%**;
+- lift versus random targeting was **2.18x**.
 <!-- AUTO_RETENTION_RESULTS_END -->
 
 ## Revenue-at-risk prioritization
@@ -150,9 +150,9 @@ churn probability × current MRR
 Across the test set:
 
 <!-- AUTO_REVENUE_RESULTS_START -->
-- expected monthly revenue at risk: **$3,036.17**;
-- expected monthly revenue at risk in the top-risk 10%: **$1,200.78**;
-- the top-risk 10% therefore concentrates about **39.5%** of modeled monthly revenue exposure.
+- expected monthly revenue at risk: **$3,679.67**;
+- expected monthly revenue at risk in the top-risk 10%: **$1,644.71**;
+- the top-risk 10% therefore concentrates about **44.7%** of modeled monthly revenue exposure.
 <!-- AUTO_REVENUE_RESULTS_END -->
 
 This is an expected-value prioritization metric, not a guaranteed revenue-loss estimate.

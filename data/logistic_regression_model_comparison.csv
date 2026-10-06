@@ -1,3 +1,3 @@
 model,roc_auc,pr_auc
-Core Behavior Logistic Regression,0.6529196124639959,0.04255000312628976
-Extended Subscription Logistic Regression,0.6525732665526418,0.04378118979546536
+Core Behavior Logistic Regression,0.4373424961790525,0.01556379979669534
+Extended Subscription Logistic Regression,0.4384339964975422,0.015560169382639582
