@@ -386,6 +386,24 @@ def update_readme(metrics: dict) -> None:
         flags=re.S,
     )
 
+    deployment_paragraph = (
+        "The deployed application uses the **"
+        + metrics["deployed_model"]
+        + "** model selected from the XGBoost variants by purged-test PR-AUC. "
+        "Subscription economics remain available downstream for revenue-at-risk "
+        "prioritization even when they do not improve churn ranking. "
+        "The comparison table above is refreshed by the reproducible retraining "
+        "script whenever the model outputs are rebuilt."
+    )
+
+    text = re.sub(
+        r"The deployed application uses the \*\*.*?\*\* model.*?"
+        r"whenever the model outputs are rebuilt\.",
+        deployment_paragraph,
+        text,
+        flags=re.S,
+    )
+
     README_PATH.write_text(text, encoding="utf-8")
 
 
@@ -616,6 +634,23 @@ def main() -> None:
         ]
     )
 
+    # Select the stronger XGBoost variant by PR-AUC on the purged
+    # out-of-time test set. Subscription economics remain available
+    # downstream for revenue-at-risk prioritization even when the
+    # behavior-only churn model ranks customers better.
+    if xgb_core_result["pr_auc"] >= xgb_extended_result["pr_auc"]:
+        selected_xgb_name = "XGBoost - Core"
+        selected_preprocessor = core_preprocessor
+        selected_xgb = xgb_core
+        selected_features = CORE_FEATURES
+        selected_probability = xgb_core_probability
+    else:
+        selected_xgb_name = "XGBoost - Extended"
+        selected_preprocessor = extended_preprocessor
+        selected_xgb = xgb_extended
+        selected_features = EXTENDED_FEATURES
+        selected_probability = xgb_extended_probability
+
     predictions = test_df[
         [
             "account_id",
@@ -629,7 +664,7 @@ def main() -> None:
     ].copy()
 
     predictions["xgb_churn_probability"] = (
-        xgb_extended_probability
+        selected_probability
     )
 
     predictions = (
@@ -651,6 +686,17 @@ def main() -> None:
         * predictions["current_mrr"]
     )
 
+    # Keep both XGBoost variants for reproducibility and save a
+    # generic selected-model artifact for the Streamlit application.
+    joblib.dump(
+        {
+            "preprocessor": core_preprocessor,
+            "model": xgb_core,
+            "features": CORE_FEATURES,
+        },
+        MODEL_DIR / "xgboost_core.pkl",
+    )
+
     joblib.dump(
         {
             "preprocessor": extended_preprocessor,
@@ -658,6 +704,16 @@ def main() -> None:
             "features": EXTENDED_FEATURES,
         },
         MODEL_DIR / "xgboost_extended.pkl",
+    )
+
+    joblib.dump(
+        {
+            "preprocessor": selected_preprocessor,
+            "model": selected_xgb,
+            "features": selected_features,
+            "model_name": selected_xgb_name,
+        },
+        MODEL_DIR / "xgboost_selected.pkl",
     )
 
     predictions.to_csv(
@@ -755,7 +811,7 @@ def main() -> None:
         "models": final_comparison.to_dict(
             orient="records"
         ),
-        "deployed_model": "XGBoost - Extended",
+        "deployed_model": selected_xgb_name,
         "retention": {
             "test_observations": int(len(predictions)),
             "actual_churners": actual_churners,
