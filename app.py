@@ -328,7 +328,7 @@ st.markdown(
 # 2. FILE PATHS
 # ============================================================
 
-MODEL_PATH = Path("models/xgboost_extended.pkl")
+MODEL_PATH = Path("models/xgboost_selected.pkl")
 
 PREDICTIONS_PATH = Path(
     "data/xgboost_test_predictions.csv"
@@ -384,11 +384,20 @@ def load_model():
     return (
         saved_model["preprocessor"],
         saved_model["model"],
-        saved_model["features"]
+        saved_model["features"],
+        saved_model.get(
+            "model_name",
+            "XGBoost - Extended"
+        )
     )
 
 
-preprocessor, model, model_features = load_model()
+(
+    preprocessor,
+    model,
+    model_features,
+    DEPLOYED_MODEL_NAME
+) = load_model()
 
 
 # ============================================================
@@ -1893,14 +1902,14 @@ May 10, 2020
     deployed_model_row = (
         model_comparison.loc[
             model_comparison["model"]
-            == "XGBoost - Extended"
+            == DEPLOYED_MODEL_NAME
         ]
         .iloc[0]
     )
 
     st.success(
         f"""
-        Deployed model: XGBoost - Extended
+        Deployed model: {DEPLOYED_MODEL_NAME}
 
         ROC-AUC: {deployed_model_row["roc_auc"]:.4f}
 
@@ -1910,7 +1919,7 @@ May 10, 2020
         """
     )
 
-    if best_model_row["model"] != "XGBoost - Extended":
+    if best_model_row["model"] != DEPLOYED_MODEL_NAME:
 
         st.info(
             f"""
@@ -2154,7 +2163,7 @@ Subscription feature engineering
 Categorical one-hot encoding
         |
         v
-Extended XGBoost classifier
+Selected XGBoost classifier
         |
         v
 Predicted churn probability
@@ -2268,20 +2277,42 @@ Risk priority             Revenue at risk
     st.subheader("14. Technical Conclusion")
 
 
-    st.write(
-        """
-        The project demonstrates an end-to-end churn analytics
-        workflow: data preparation, behavioral and subscription
-        feature engineering, exploratory analysis, temporal
-        validation, Logistic Regression benchmarking, XGBoost
-        modeling, customer risk ranking, and revenue-based retention
-        prioritization.
+    if DEPLOYED_MODEL_NAME == "XGBoost - Core":
 
-        The Extended XGBoost model produced the strongest
-        out-of-time performance and was therefore selected as the
-        final model for deployment.
-        """
-    )
+        st.write(
+            """
+            The project demonstrates an end-to-end churn analytics
+            workflow: data preparation, behavioral and subscription
+            feature engineering, exploratory analysis, purged temporal
+            validation, Logistic Regression benchmarking, XGBoost
+            modeling, customer risk ranking, and revenue-based retention
+            prioritization.
+
+            Under the stricter purged out-of-time split, the Core
+            XGBoost model achieved the strongest PR-AUC. The synthetic
+            subscription extension was therefore not forced into the
+            churn-risk model. Subscription economics are still used
+            downstream to convert churn probabilities into
+            revenue-at-risk priorities.
+            """
+        )
+
+    else:
+
+        st.write(
+            """
+            The project demonstrates an end-to-end churn analytics
+            workflow: data preparation, behavioral and subscription
+            feature engineering, exploratory analysis, purged temporal
+            validation, Logistic Regression benchmarking, XGBoost
+            modeling, customer risk ranking, and revenue-based retention
+            prioritization.
+
+            The Extended XGBoost model produced the strongest
+            out-of-time ranking performance and was selected as the
+            final model for deployment.
+            """
+        )
 
 
 # ============================================================

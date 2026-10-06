@@ -41,7 +41,7 @@ The final project extends the behavioral baseline with a richer synthetic subscr
 - all eight SocialNet behavior types;
 - additional engagement and behavioral-ratio features.
 
-The final modeling workflow compares a behavior-only feature set with the extended behavior + subscription feature set.
+The final modeling workflow compares a behavior-only feature set with the extended behavior + subscription feature set. Under the stricter purged validation, the behavior-only XGBoost model has the strongest PR-AUC, so the project keeps subscription economics downstream for revenue-at-risk prioritization rather than forcing them into the churn-risk model.
 
 ## Project flow
 
@@ -62,7 +62,7 @@ flowchart TD
     K --> M[XGBoost: core vs extended]
     L --> N[Model comparison]
     M --> N
-    N --> O[Extended XGBoost deployed]
+    N --> O[Selected XGBoost deployed]
     O --> P[Churn probability and risk ranking]
     P --> Q[Top 10% retention target]
     P --> R[Probability x MRR]
