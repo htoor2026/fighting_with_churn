@@ -1818,13 +1818,18 @@ with technical_tab:
         """
 February 9, 2020
         |
-        |   Training observations
+        |  Training observations
         |
-        |---------------- April 11, 2020
-                           |
-                           |   Out-of-time test observations
-                           |
-                           |---------------- May 10, 2020
+March 10, 2020
+        |
+        |  One-month purge / embargo
+        |  (labels mature before test period)
+        |
+April 11, 2020
+        |
+        |  Out-of-time test observations
+        |
+May 10, 2020
         """,
         language="text"
     )
@@ -1832,16 +1837,15 @@ February 9, 2020
 
     st.write(
         """
-        A temporal train/test split was used.
+        The churn label looks forward approximately one month.
+        A one-month purge gap is therefore placed between the
+        training observations and the out-of-time test period.
 
-        Earlier observations were used for model training and later
-        observations were held out for evaluation.
-
-        This is closer to the real production scenario in which
-        historical customer behavior is used to predict future churn.
+        This prevents training labels from using outcome windows
+        that overlap the future evaluation period and provides a
+        stricter forecasting-style validation design.
         """
     )
-
 
     # ========================================================
     # 7. MODEL COMPARISON
