@@ -623,7 +623,7 @@ with business_tab:
 
         st.metric(
             "Top 10% Churners Captured",
-            "31.9%"
+            f"{CAPTURE_RATE:.1%}"
         )
 
 
@@ -631,7 +631,7 @@ with business_tab:
 
         st.metric(
             "Retention Lift",
-            "3.19x"
+            f"{RETENTION_LIFT:.2f}x"
         )
 
 
@@ -639,7 +639,7 @@ with business_tab:
 
         st.metric(
             "Targeted Group Churn Rate",
-            "5.15%"
+            f"{TOP_RISK_CHURN_RATE:.2%}"
         )
 
 
@@ -647,7 +647,7 @@ with business_tab:
 
         st.metric(
             "Overall Test Churn Rate",
-            "1.61%"
+            f"{OVERALL_CHURN_RATE:.2%}"
         )
 
 
