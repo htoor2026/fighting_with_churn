@@ -1890,17 +1890,35 @@ May 10, 2020
         .iloc[0]
     )
 
+    deployed_model_row = (
+        model_comparison.loc[
+            model_comparison["model"]
+            == "XGBoost - Extended"
+        ]
+        .iloc[0]
+    )
+
     st.success(
         f"""
-        Final model by PR-AUC: {best_model_row["model"]}
+        Deployed model: XGBoost - Extended
 
-        ROC-AUC: {best_model_row["roc_auc"]:.4f}
+        ROC-AUC: {deployed_model_row["roc_auc"]:.4f}
 
-        PR-AUC: {best_model_row["pr_auc"]:.4f}
+        PR-AUC: {deployed_model_row["pr_auc"]:.4f}
 
         Test-period churn prevalence: {OVERALL_CHURN_RATE:.2%}
         """
     )
+
+    if best_model_row["model"] != "XGBoost - Extended":
+
+        st.info(
+            f"""
+            Highest PR-AUC in the current comparison:
+            {best_model_row["model"]}
+            ({best_model_row["pr_auc"]:.4f}).
+            """
+        )
 
 
     logistic_core_pr = model_comparison.loc[
