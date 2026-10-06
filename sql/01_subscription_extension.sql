@@ -8,6 +8,8 @@
 -- portfolio project. It is reconstructed from the final dataset schema,
 -- notebooks, application logic, and project workflow; it is not claimed
 -- to be a byte-for-byte copy of the original one-off development script.
+-- The deterministic assignment rules below are portfolio reconstruction
+-- rules and are not guaranteed to reproduce the committed CSV row-for-row.
 --
 -- Design retained from the final project:
 --   * plans: Basic / Plus / Premium
