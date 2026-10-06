@@ -214,7 +214,7 @@ sql/02_final_training_dataset.sql
 
 ## Run locally
 
-Clone the repository and install the dependencies:
+The saved models and notebooks were built with Python 3.12.13 and the pinned package versions in `requirements.txt`. Clone the repository and install the dependencies:
 
 ```bash
 git clone https://github.com/htoor2026/fighting_with_churn.git
