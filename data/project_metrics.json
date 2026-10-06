@@ -29,18 +29,18 @@
       "pr_auc": 0.035276363294268906
     }
   ],
-  "deployed_model": "XGBoost - Extended",
+  "deployed_model": "XGBoost - Core",
   "retention": {
     "test_observations": 11645,
     "actual_churners": 188,
     "targeted_observations": 1165,
-    "captured_churners": 41,
-    "capture_rate": 0.21808510638297873,
+    "captured_churners": 39,
+    "capture_rate": 0.2074468085106383,
     "overall_churn_rate": 0.01614426792614856,
-    "target_churn_rate": 0.0351931330472103,
-    "lift": 2.1799150762487445,
-    "total_revenue_at_risk": 3679.67402679674,
-    "high_priority_revenue_at_risk": 1644.7142555406317,
-    "high_priority_revenue_share": 0.44697281432083863
+    "target_churn_rate": 0.03347639484978541,
+    "lift": 2.0735777554561228,
+    "total_revenue_at_risk": 3697.8607060439826,
+    "high_priority_revenue_at_risk": 1655.0437196828425,
+    "high_priority_revenue_share": 0.44756789161304805
   }
 }

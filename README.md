@@ -121,7 +121,7 @@ Models compared:
 Best model by PR-AUC: **XGBoost - Core**.
 <!-- AUTO_MODEL_RESULTS_END -->
 
-The deployed application uses the **Extended XGBoost** model so scoring can incorporate both behavioral and subscription signals. The comparison table above is refreshed by the reproducible retraining script whenever the model outputs are rebuilt.
+The deployed application uses the **XGBoost - Core** model selected from the XGBoost variants by purged-test PR-AUC. Subscription economics remain available downstream for revenue-at-risk prioritization even when they do not improve churn ranking. The comparison table above is refreshed by the reproducible retraining script whenever the model outputs are rebuilt.
 
 Because churn is rare, PR-AUC and lift are emphasized alongside ROC-AUC rather than using accuracy as the primary metric.
 
@@ -134,9 +134,9 @@ On the out-of-time test set:
 - 188 churners were observed;
 - baseline churn rate was **1.61%**;
 - targeting the highest-risk 10% selected 1,165 customers;
-- that group captured **41 of 188 churners (21.81%)**;
-- churn rate inside the targeted group was **3.52%**;
-- lift versus random targeting was **2.18x**.
+- that group captured **39 of 188 churners (20.74%)**;
+- churn rate inside the targeted group was **3.35%**;
+- lift versus random targeting was **2.07x**.
 <!-- AUTO_RETENTION_RESULTS_END -->
 
 ## Revenue-at-risk prioritization
@@ -150,9 +150,9 @@ churn probability × current MRR
 Across the test set:
 
 <!-- AUTO_REVENUE_RESULTS_START -->
-- expected monthly revenue at risk: **$3,679.67**;
-- expected monthly revenue at risk in the top-risk 10%: **$1,644.71**;
-- the top-risk 10% therefore concentrates about **44.7%** of modeled monthly revenue exposure.
+- expected monthly revenue at risk: **$3,697.86**;
+- expected monthly revenue at risk in the top-risk 10%: **$1,655.04**;
+- the top-risk 10% therefore concentrates about **44.8%** of modeled monthly revenue exposure.
 <!-- AUTO_REVENUE_RESULTS_END -->
 
 This is an expected-value prioritization metric, not a guaranteed revenue-loss estimate.
