@@ -677,7 +677,7 @@ with business_tab:
 
         st.metric(
             "Expected Monthly Revenue at Risk",
-            "$3,036.17"
+            f"${TOTAL_REVENUE_AT_RISK:,.2f}"
         )
 
 
@@ -685,7 +685,7 @@ with business_tab:
 
         st.metric(
             "High-Priority Revenue at Risk",
-            "$1,200.78"
+            f"${HIGH_PRIORITY_REVENUE_AT_RISK:,.2f}"
         )
 
 
