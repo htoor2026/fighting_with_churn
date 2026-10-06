@@ -7,3 +7,7 @@ __pycache__/
 venv/
 anaconda_projects/
 *.pages
+.pytest_cache/
+.mypy_cache/
+.idea/
+.vscode/
