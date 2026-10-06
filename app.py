@@ -1957,81 +1957,45 @@ May 10, 2020
     st.subheader("8. Important Predictive Features")
 
 
-    feature_importance = pd.DataFrame(
-        {
-
-            "Feature": [
-
-                "Total engagement",
-
-                "Replies per month",
-
-                "Account tenure",
-
-                "New friends per month",
-
-                "Messages per month",
-
-                "Unfriend rate",
-
-                "Posts per month",
-
-                "Total activity",
-
-                "Country - CA",
-
-                "Channel - appstore2",
-
-                "Ad-view share",
-
-                "Negative activity share",
-
-                "Discount",
-
-                "Dislike rate",
-
-                "Billing period",
-
-                "Current MRR"
-            ],
-
-            "Importance": [
-
-                0.057246,
-
-                0.037523,
-
-                0.035640,
-
-                0.032505,
-
-                0.031875,
-
-                0.031689,
-
-                0.030159,
-
-                0.027056,
-
-                0.026445,
-
-                0.025410,
-
-                0.024854,
-
-                0.024199,
-
-                0.023656,
-
-                0.023612,
-
-                0.022538,
-
-                0.022513
-            ]
-        }
+    transformed_feature_names = (
+        preprocessor
+        .get_feature_names_out()
     )
 
+    feature_importance = (
+        pd.DataFrame(
+            {
+                "Feature": transformed_feature_names,
+                "Importance": model.feature_importances_
+            }
+        )
+        .sort_values(
+            "Importance",
+            ascending=False
+        )
+        .head(16)
+        .copy()
+    )
+
+    feature_importance["Feature"] = (
+        feature_importance["Feature"]
+        .str.replace(
+            "numeric__",
+            "",
+            regex=False
+        )
+        .str.replace(
+            "categorical__",
+            "",
+            regex=False
+        )
+        .str.replace(
+            "_",
+            " ",
+            regex=False
+        )
+        .str.title()
+    )
 
     st.dataframe(
         feature_importance,
@@ -2042,9 +2006,9 @@ May 10, 2020
 
     st.write(
         """
-        Behavioral engagement was the strongest source of predictive
-        information. Subscription characteristics also contributed
-        incremental predictive value.
+        The table is generated directly from the currently loaded
+        XGBoost model, so it stays synchronized when the model is
+        retrained.
         """
     )
 
@@ -2056,7 +2020,6 @@ May 10, 2020
         increasing a variable raises or lowers churn probability.
         """
     )
-
 
     # ========================================================
     # 9. RETENTION PERFORMANCE
