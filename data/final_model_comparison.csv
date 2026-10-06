@@ -1,0 +1,5 @@
+model,roc_auc,pr_auc
+Logistic - Core,0.6529,0.0426
+Logistic - Extended,0.6526,0.0438
+XGBoost - Core,0.6619183385053085,0.05890140143569681
+XGBoost - Extended,0.6735044449272859,0.062001517182713184
