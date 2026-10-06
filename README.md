@@ -210,6 +210,8 @@ notebooks/06_retention_business_analysis.ipynb
 
 sql/01_subscription_extension.sql
 sql/02_final_training_dataset.sql
+
+scripts/retrain_models.py
 ```
 
 ## Run locally
